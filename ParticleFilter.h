@@ -101,7 +101,7 @@ public:
 #define THIS this
 #endif
 
-	auto run(ObservationType& observation)
+    auto run(const ObservationType& observation)
 			-> decltype(THIS->WinnerPolicy<StateType, WeightType>::winner(
 				std::vector<StateType>(), std::vector<WeightType>())) {
 		static_assert(std::is_floating_point<WeightType>::value,
@@ -126,9 +126,15 @@ public:
 		for(auto w : particle_weights) {
 			wsum += w;
 		}
-		for(size_t i = 0; i < num_particles; ++i) {
-			particle_weights[i] /= wsum;
-		}
+        if(wsum == 0) { // if all weights are zero
+            for(auto& p : particle_weights) {
+                p = 1.0 / num_particles;
+            }
+        } else {
+            for(size_t i = 0; i < num_particles; ++i) {
+                particle_weights[i] /= wsum;
+            }
+        }
 
 		// resampling
 		ResamplingPolicy<StateType, WeightType>::resampling(particles, particle_weights);

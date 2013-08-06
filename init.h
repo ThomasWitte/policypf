@@ -6,6 +6,7 @@
 #include <deque>
 #include <array>
 #include <type_traits>
+#include <algorithm>
 
 namespace policy_pf {
 namespace init_policies {

@@ -3,6 +3,7 @@
 
 #include <random>
 #include <vector>
+#include <numeric>
 
 namespace policy_pf {
 namespace resampling_policies {
@@ -18,11 +19,9 @@ protected:
 		 * sich edges als Treppe mit je nach Gewicht unterschiedlich hohen Stufen vorstellen kann.
 		 */
 		std::vector<Weight> edges(num_particles + 1, 0);
-		for(unsigned int i = 1; i < edges.size(); ++i) {
-			edges[i] = edges[i-1] + weight_v[i-1];
-			edges[i] > 1 ? edges[i] = 1 : 0;
-		}
-		edges.back() = 1;
+        std::partial_sum(weight_v.cbegin(), weight_v.cend(), edges.begin()+1);
+        for(auto& e : edges) e > 1 ? e = 1 : 0;
+        edges.back() = 1;
 
 		/*
 		 * Ein Startwert [0,1/n] wird zufällig gewählt und danach jeweils um 1/n erhöht.
